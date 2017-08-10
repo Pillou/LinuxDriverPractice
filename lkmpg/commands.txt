@@ -1,0 +1,60 @@
+LEARNING LINUX MODULE
+=====================
+
+All the work done here is based on :
+http://tldp.org/LDP/lkmpg/2.6/html/lkmpg.html
+
+
+Documentation can be found here :
+/usr/src/linux-source-4.9/Documentation/devices.txt 
+
+
+
+
+Commands
+========
+
+Load a module:
+-------------
+
+sudo insmod module_name.ko
+
+
+Remove a module:
+---------------
+
+sudo rmmod module_name
+
+
+Read logs:
+---------
+
+sudo less /var/log/messages
+
+
+Check running modules:
+---------------------
+
+lsmod
+
+or
+
+less /proc/module
+
+to just check if the module is running add
+
+| grep module_name 
+
+
+Get module info
+---------------
+
+sudo modinfo
+
+
+Create a device file
+--------------------
+
+mknod /dev/coffee c 12 2
+
+create new char device with major version 12 and minor version 2

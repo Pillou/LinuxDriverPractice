@@ -1,0 +1,19 @@
+The /proc File System
+=====================
+
+The /proc file system offer an additional mechanism for the kernel and 
+kernel modules to send information to the processes.
+
+The method to use is similar to the one used with device drivers.
+A structure is created to containing all the information needed for the 
+/proc file, including a pointers to handler functions.
+
+"init_module" registers the structure and "cleanup_module" unregisters 
+it.
+
+No functions of the module get called when the file is opened or close. 
+Therefore we cannot use the "try_module_get" and "try_module_put" in 
+this module.
+If the file is opened and then the module is removed, thehre is no way 
+to avoid the consequences.
+
