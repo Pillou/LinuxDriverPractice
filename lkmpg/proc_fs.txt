@@ -28,4 +28,9 @@ Steps :
 	Delete entry in module_cleanup
 
 
+
+for more information and example:
+www.linux.com/learn/kernel-newbie-corner-kernel-debugging-using-proc-sequence-files-part-1
+
+www.cs.fsu.edu/~cop4610t/lectures/project2/procfs_module/proc_module.pdf
  

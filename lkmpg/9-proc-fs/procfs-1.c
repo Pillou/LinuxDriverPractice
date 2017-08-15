@@ -13,19 +13,22 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("GLC");
 MODULE_DESCRIPTION("Simple module to test proc read");
 
-#define ENTRY_NAME	"HelloWorld"
-#define PERMS		(0644)
-#define PARENT		(NULL)
-#define BUFFER_SIZE	(100)
+#define ENTRY_NAME		"HelloWorld"
+#define PERMS			(0644)
+#define PARENT			(NULL)
+#define BUFFER_SIZE_MAX		(100)
 
-static const char buffer[] = "Hello World!\n";
+
+static char buffer[BUFFER_SIZE_MAX+1];
+static int buffer_size = 0;
+static int buffer_position = 0;
 
 static struct file_operations fops;
 
 
 static int proc_open(struct inode * inode, struct file * file) {
 	printk( KERN_INFO "Proc called open");
-
+	buffer_position = 0;
 	return 0;
 }
 
@@ -34,22 +37,39 @@ static ssize_t proc_read(struct file * file, char __user *buf, size_t size, loff
 	 * needed because user uses virtual memory
  	 * prevents crashing to inaccessible regions
 	 * can handle architecture specific issues */
-	int length = sizeof(buffer) / sizeof(buffer[0]);
-	static int read = 1;
-
-	if( read == 0 ){
-		read = 1;
+	if(buffer_position >= buffer_size){
+		buffer_position = 0;
 		return 0;
-	}else{
-		read = 0;
 	}
 
-	if(copy_to_user(buf, buffer, length) != 0){
+	if(copy_to_user(buf, buffer, buffer_size) != 0){
 		printk(KERN_INFO "ERROR! copy_to_user");
 		return -ENOMEM;
 	}
+	buffer_position += buffer_size;
 	printk( KERN_INFO "Proc called read");
-	return length;
+
+	return buffer_size;
+}
+
+static int proc_write(struct file *file, const char __user *user_buffer, size_t count, loff_t* off){
+	int size = 0;
+	if(count < BUFFER_SIZE_MAX){
+		size = count;
+	} else {
+		size = BUFFER_SIZE_MAX;
+	}
+	printk(KERN_INFO "Proc called write\n");
+
+	if(copy_from_user(buffer, user_buffer, size) != 0){
+		printk(KERN_INFO "ERROR! in proc write\n");
+		buffer_size = 0;
+		return -EFAULT;
+	}
+	buffer[size] = '\0';
+	printk( KERN_INFO "Buffer : %s\n", buffer);
+	buffer_size = size;
+	return buffer_size;
 }
 
 static int proc_release(struct inode * inode, struct file *file){
@@ -68,6 +88,7 @@ static int __init proc_init_module(void)
 	fops.owner = THIS_MODULE;
 	fops.open = proc_open;
 	fops.read = proc_read;
+	fops.write = proc_write;
 	fops.release = proc_release;
 
 	if(proc_create(ENTRY_NAME, PERMS, NULL, &fops) == NULL){

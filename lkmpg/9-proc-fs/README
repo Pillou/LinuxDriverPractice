@@ -1,0 +1,13 @@
+How to use:
+
+make
+
+insmod procfs-1.ko
+
+echo "Send this message to /proc/HelloWorld" > /proc/HelloWorld
+
+cat /proc/HelloWorld
+
+rmmod procfs-1
+
+dmesg
