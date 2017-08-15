@@ -1,3 +1,4 @@
+
 The /proc File System
 =====================
 
@@ -14,6 +15,17 @@ it.
 No functions of the module get called when the file is opened or close. 
 Therefore we cannot use the "try_module_get" and "try_module_put" in 
 this module.
-If the file is opened and then the module is removed, thehre is no way 
+If the file is opened and then the module is removed, there is no way 
 to avoid the consequences.
 
+
+Steps :
+	Create entry in module_init
+	Create file system functions
+		open
+		read
+		close
+	Delete entry in module_cleanup
+
+
+ 
